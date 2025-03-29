@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>籃球比賽紀錄系統</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      text-align: center;
+      padding: 20px;
+    }
+
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 95%;
+      background: white;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+
+    .stat-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .stat-control button {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      font-size: 14px;
+    }
+
+    tfoot td {
+      font-weight: bold;
+      background-color: #f0f0f0;
+    }
+
+    .shot-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    .top-row, .bottom-row {
+      display: flex;
+      gap: 5px;
+    }
+
+    .combo-display {
+      margin: 5px 0;
+      font-size: 16px;
+    }
+
+    .sort-icon {
+      font-size: 12px;
+      margin-left: 5px;
+      color: white;
+      cursor: pointer;
+    }
+
+    th.asc .sort-icon::after {
+      content: "▲";
+    }
+
+    th.desc .sort-icon::after {
+      content: "▼";
+    }
+
+    th {
+      position: relative;
+      user-select: none;
+    }
+
+    th.sort-asc::after,
+    th.sort-desc::after {
+      font-size: 14px;
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    th.sort-asc::after {
+      content: "▲";
+      color: yellow;
+    }
+
+    th.sort-desc::after {
+      content: "▼";
+      color: yellow;
+    }
+
+  </style>
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <h1>🏀 籃球比賽紀錄系統</h1>
+
+  <div>
+    <select id="player-select">
+      <option value="">請選擇球員</option>
+    </select>
+    <button onclick="addSelectedPlayer()">新增球員</button>
+  </div>
+
+  <table id="stats-table">
+    <thead>
+      <tr>
+        <th onclick="sortTable(0)">背號</th>
+        <th onclick="sortTable(1)">名字</th>
+        <th onclick="sortTable(2)">2分</th>
+        <th onclick="sortTable(3)">2分%</th>
+        <th onclick="sortTable(4)">3分</th>
+        <th onclick="sortTable(5)">3分%</th>
+        <th onclick="sortTable(6)">罰球</th>
+        <th onclick="sortTable(7)">罰球%</th>
+        <th onclick="sortTable(8)">得分</th>
+        <th onclick="sortTable(9)">助攻</th>
+        <th onclick="sortTable(10)">進攻籃板</th>
+        <th onclick="sortTable(11)">防守籃板</th>
+        <th onclick="sortTable(12)">抄截</th>
+        <th onclick="sortTable(13)">阻攻</th>
+        <th onclick="sortTable(14)">失誤</th>
+        <th onclick="sortTable(15)">犯規</th>
+      </tr>
+    </thead>
+    <tbody id="player-table"></tbody>
+    <tfoot>
+      <tr id="team-total-row">
+        <td colspan="2">全隊合計</td>
+        <td id="team-2pt"></td>
+        <td id="team-2pt-pct"></td>
+        <td id="team-3pt"></td>
+        <td id="team-3pt-pct"></td>
+        <td id="team-ft"></td>
+        <td id="team-ft-pct"></td>
+        <td id="team-score"></td>
+        <td id="team-assist"></td>
+        <td id="team-offreb"></td>
+        <td id="team-defreb"></td>
+        <td id="team-steal"></td>
+        <td id="team-block"></td>
+        <td id="team-turnover"></td>
+        <td id="team-foul"></td>
+      </tr>
+    </tfoot>
+  </table>
+</body>
+</html>

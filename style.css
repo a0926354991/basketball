@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f7f7f7;
+    padding: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+/* 表格樣式 */
+table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #007BFF;
+    color: white;
+}
