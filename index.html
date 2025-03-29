@@ -12,7 +12,7 @@
       text-align: center;
       padding: 20px;
     }
-
+  
     table {
       margin: 20px auto;
       border-collapse: collapse;
@@ -20,75 +20,27 @@
       background: white;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
-
+  
     th, td {
       border: 1px solid #ccc;
       padding: 6px;
       text-align: center;
     }
-
+  
     th {
       background-color: #007BFF;
       color: white;
       cursor: pointer;
-    }
-
-    .stat-control {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .stat-control button {
-      width: 24px;
-      height: 24px;
-      padding: 0;
-      font-size: 14px;
-    }
-
-    tfoot td {
-      font-weight: bold;
-      background-color: #f0f0f0;
-    }
-
-    .shot-control {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-weight: bold;
-    }
-
-    .top-row, .bottom-row {
-      display: flex;
-      gap: 5px;
-    }
-
-    .combo-display {
-      margin: 5px 0;
-      font-size: 16px;
-    }
-
-    .sort-icon {
-      font-size: 12px;
-      margin-left: 5px;
-      color: white;
-      cursor: pointer;
-    }
-
-    th.asc .sort-icon::after {
-      content: "▲";
-    }
-
-    th.desc .sort-icon::after {
-      content: "▼";
-    }
-
-    th {
       position: relative;
       user-select: none;
+      padding-right: 24px; /* 預留箭頭空間 */
     }
-
+  
+    .sort-label {
+      display: inline-block;
+      margin-right: 8px; /* 避開箭頭 */
+    }
+  
     th.sort-asc::after,
     th.sort-desc::after {
       font-size: 14px;
@@ -96,23 +48,59 @@
       right: 8px;
       top: 50%;
       transform: translateY(-50%);
+      pointer-events: none;
+      color: white;
     }
-
+  
     th.sort-asc::after {
       content: "▲";
-      color: yellow;
     }
-
+  
     th.sort-desc::after {
       content: "▼";
-      color: yellow;
     }
-
+  
+    .stat-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+  
+    .stat-control button {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      font-size: 14px;
+    }
+  
+    tfoot td {
+      font-weight: bold;
+      background-color: #f0f0f0;
+    }
+  
+    .shot-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-weight: bold;
+    }
+  
+    .top-row, .bottom-row {
+      display: flex;
+      gap: 5px;
+    }
+  
+    .combo-display {
+      margin: 5px 0;
+      font-size: 16px;
+    }
   </style>
+  
   <script defer src="script.js"></script>
 </head>
 <body>
-  <h1>🏀 籃球比賽紀錄系統</h1>
+  <h1>籃球比賽紀錄系統</h1>
 
   <div>
     <select id="player-select">
@@ -124,22 +112,22 @@
   <table id="stats-table">
     <thead>
       <tr>
-        <th onclick="sortTable(0)">背號</th>
-        <th onclick="sortTable(1)">名字</th>
-        <th onclick="sortTable(2)">2分</th>
-        <th onclick="sortTable(3)">2分%</th>
-        <th onclick="sortTable(4)">3分</th>
-        <th onclick="sortTable(5)">3分%</th>
-        <th onclick="sortTable(6)">罰球</th>
-        <th onclick="sortTable(7)">罰球%</th>
-        <th onclick="sortTable(8)">得分</th>
-        <th onclick="sortTable(9)">助攻</th>
-        <th onclick="sortTable(10)">進攻籃板</th>
-        <th onclick="sortTable(11)">防守籃板</th>
-        <th onclick="sortTable(12)">抄截</th>
-        <th onclick="sortTable(13)">阻攻</th>
-        <th onclick="sortTable(14)">失誤</th>
-        <th onclick="sortTable(15)">犯規</th>
+        <th onclick="sortTable(0)"><span class="sort-label">背號</span></th>
+        <th onclick="sortTable(1)"><span class="sort-label">名字</span></th>
+        <th onclick="sortTable(2)"><span class="sort-label">2分</span></th>
+        <th onclick="sortTable(3)"><span class="sort-label">2分%</span></th>
+        <th onclick="sortTable(4)"><span class="sort-label">3分</span></th>
+        <th onclick="sortTable(5)"><span class="sort-label">3分%</span></th>
+        <th onclick="sortTable(6)"><span class="sort-label">罰球</span></th>
+        <th onclick="sortTable(7)"><span class="sort-label">罰球%</span></th>
+        <th onclick="sortTable(8)"><span class="sort-label">得分</span></th>
+        <th onclick="sortTable(9)"><span class="sort-label">助攻</span></th>
+        <th onclick="sortTable(10)"><span class="sort-label">進攻籃板</span></th>
+        <th onclick="sortTable(11)"><span class="sort-label">防守籃板</span></th>
+        <th onclick="sortTable(12)"><span class="sort-label">抄截</span></th>
+        <th onclick="sortTable(13)"><span class="sort-label">阻攻</span></th>
+        <th onclick="sortTable(14)"><span class="sort-label">失誤</span></th>
+        <th onclick="sortTable(15)"><span class="sort-label">犯規</span></th>
       </tr>
     </thead>
     <tbody id="player-table"></tbody>

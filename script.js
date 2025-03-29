@@ -1,3 +1,4 @@
+// 初始化 Firebase
 const roster = {};
 const players = {};
 
@@ -8,6 +9,7 @@ firebase.initializeApp({
 });
 const db = firebase.firestore();
 
+// 抓取名單，填入選單
 db.collection("roster").get().then(snapshot => {
   snapshot.forEach(doc => {
     const player = doc.data();
@@ -200,9 +202,20 @@ function sortTable(n) {
   header.classList.toggle("desc", !isAsc);
 
   rows.sort((a, b) => {
-    const x = parseFloat(a.children[n].innerText.split("-")[0].replace('%', '')) || 0;
-    const y = parseFloat(b.children[n].innerText.split("-")[0].replace('%', '')) || 0;
-    return isAsc ? x - y : y - x;
+    const getCellValue = (row, index) => {
+      const text = row.children[index].innerText.trim();
+      if (text.includes('-')) return parseFloat(text.split('-')[0]) || 0;
+      if (text.includes('%')) return parseFloat(text.replace('%', '')) || 0;
+      return isNaN(text) ? text : parseFloat(text);
+    };
+
+    const x = getCellValue(a, n);
+    const y = getCellValue(b, n);
+
+    if (typeof x === "number" && typeof y === "number") {
+      return isAsc ? x - y : y - x;
+    }
+    return isAsc ? x.localeCompare(y) : y.localeCompare(x);
   });
 
   const tbody = table.querySelector("tbody");
