@@ -233,3 +233,10 @@ function updateSortableHeaders() {
     th.style.cursor = "pointer";
   });
 }
+
+function updateScore(team, points) {
+  let scoreElement = document.getElementById(`score-team-${team.toLowerCase()}`);
+  let currentScore = parseInt(scoreElement.textContent, 10);
+  let newScore = Math.max(0, currentScore + points);
+  scoreElement.textContent = newScore;
+}
