@@ -246,20 +246,19 @@ let gameTime = 600; // 每節10分鐘
 let currentQuarter = 1; // 第一節
 let intervalId = null;
 let isPaused = true; // 初始為暫停狀態
-let playerStats = {}; // 存儲球員得分和上場時間
 
 // 開始計時
 function startTimer() {
-  if (!intervalId) { // 確保計時器尚未開始才啟動
+  if (!intervalId && currentQuarter <= 4) { // 確保計時器尚未開始且比賽未結束
     isPaused = false;
     intervalId = setInterval(function() {
-      if (!isPaused) { // 確保不是暫停狀態
+      if (!isPaused) { 
         gameTime--;
         updateGameTime();
-        if (gameTime === 0) {
+        if (gameTime === 0) { 
           clearInterval(intervalId);
           intervalId = null;
-          nextQuarter();
+          nextQuarter(); // 進入下一節
         }
       }
     }, 1000);
@@ -267,22 +266,22 @@ function startTimer() {
     // 按鈕狀態調整
     document.getElementById('start-btn').disabled = true; 
     document.getElementById('pause-btn').disabled = false; 
-    document.getElementById('resume-btn').style.display = 'none'; // 隱藏「繼續比賽」
+    document.getElementById('resume-btn').style.display = 'none';
   }
 }
 
 // 暫停計時器
 function pauseTimer() {
-  isPaused = true; // 設定為暫停狀態
-  document.getElementById('pause-btn').disabled = true; // 禁用暫停按鈕
-  document.getElementById('resume-btn').style.display = 'inline-block'; // 顯示「繼續比賽」
+  isPaused = true;
+  document.getElementById('pause-btn').disabled = true;
+  document.getElementById('resume-btn').style.display = 'inline-block';
 }
 
 // 繼續計時
 function resumeTimer() {
-  isPaused = false; // 取消暫停狀態
-  document.getElementById('pause-btn').disabled = false; // 啟用暫停按鈕
-  document.getElementById('resume-btn').style.display = 'none'; // 隱藏「繼續比賽」
+  isPaused = false;
+  document.getElementById('pause-btn').disabled = false;
+  document.getElementById('resume-btn').style.display = 'none';
 }
 
 // 更新比賽時間顯示
@@ -292,23 +291,32 @@ function updateGameTime() {
   document.getElementById('game-time').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
-// 下一節
+// 進入下一節
 function nextQuarter() {
   if (currentQuarter < 4) {
     currentQuarter++;
     gameTime = 600; // 重置為10分鐘
     document.getElementById('quarter').textContent = currentQuarter;
-    
-    // 等待使用者按「開始比賽」
+
+    // 等待手動開始比賽
     document.getElementById('start-btn').disabled = false;
     document.getElementById('pause-btn').disabled = true;
-    document.getElementById('resume-btn').style.display = 'none'; // 隱藏「繼續比賽」
+    document.getElementById('resume-btn').style.display = 'none';
     isPaused = true;
-    intervalId = null; // 重置計時器
+    intervalId = null;
   } else {
-    clearInterval(intervalId);
     alert('比賽結束');
+    stopGame();
   }
+}
+
+// 停止比賽（比賽結束）
+function stopGame() {
+  clearInterval(intervalId);
+  intervalId = null;
+  document.getElementById('start-btn').disabled = true;
+  document.getElementById('pause-btn').disabled = true;
+  document.getElementById('resume-btn').disabled = true;
 }
 
 // 設定按鈕事件
