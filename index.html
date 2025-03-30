@@ -184,15 +184,13 @@
     </thead>
     <tbody>
       <tr>
-        <td id="display-team-a" class="editable" contenteditable="true">隊伍 A</td>
+        <td id="display-team-a">IM</td> <!-- 固定為 IM，移除 contenteditable -->
         <td id="score-team-a">0</td>
-        <td class="score-control">
-          <button onclick="updateScore('A', 1)">+1</button>
-          <button onclick="updateScore('A', -1)">-1</button>
+        <td class="score-control">（自動同步）</td>
         </td>
       </tr>
       <tr>
-        <td id="display-team-b" class="editable" contenteditable="true">隊伍 B</td>
+        <td id="display-team-b" class="editable" contenteditable="true">隊伍 B</td> <!-- 仍可編輯 -->
         <td id="score-team-b">0</td>
         <td class="score-control">
           <button onclick="updateScore('B', 1)">+1</button>
@@ -200,6 +198,6 @@
         </td>
       </tr>
     </tbody>
-  </table>
+  </table>  
 </body>
 </html>

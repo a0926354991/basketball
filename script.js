@@ -186,6 +186,7 @@ function updateTeamTotal() {
   document.getElementById("team-block").innerText = total.block;
   document.getElementById("team-turnover").innerText = total.turnover;
   document.getElementById("team-foul").innerText = total.foul;
+  document.getElementById("score-team-a").textContent = total.score;
 }
 
 function calcPct(made, miss) {
@@ -234,12 +235,21 @@ function updateSortableHeaders() {
   });
 }
 
-function updateScore(team, points) {
-  let scoreElement = document.getElementById(`score-team-${team.toLowerCase()}`);
-  let currentScore = parseInt(scoreElement.textContent, 10);
-  let newScore = Math.max(0, currentScore + points);
-  scoreElement.textContent = newScore;
+function updateScore(team, value) {
+  if (team === 'A') {
+    let scoreA = document.getElementById("score-team-a");
+    let newScore = Math.max(0, parseInt(scoreA.textContent) + value); // 確保不會變負數
+    scoreA.textContent = newScore;
+
+    // 同步更新隊伍合計得分
+    document.getElementById("team-score").textContent = newScore;
+  } else if (team === 'B') {
+    let scoreB = document.getElementById("score-team-b");
+    let newScore = Math.max(0, parseInt(scoreB.textContent) + value);
+    scoreB.textContent = newScore;
+  }
 }
+
 
 // 記錄當前比賽時間和節數
 let gameTime = 600; // 每節10分鐘
