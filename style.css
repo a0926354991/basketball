@@ -9,6 +9,15 @@ h1 {
     color: #333;
 }
 
+h4, h3, h2, th {
+    font-size: 20px;
+}
+  
+#score-log th, #scoreboard th {
+    font-size: 18px;
+}
+  
+
 /* 表格樣式 */
 table {
     width: 90%;

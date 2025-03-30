@@ -116,6 +116,7 @@
   <p>目前比賽節數：<span id="quarter">1</span></p>
   <p>剩餘時間：<span id="game-time">10:00</span></p>
 
+  <h2>BOXSCORE</h2>
   <table id="stats-table">
     <thead>
       <tr>
@@ -159,21 +160,7 @@
     </tfoot>
   </table>
 
-  <h2>得分紀錄</h2>
-  <table id="event-log">
-    <thead>
-      <tr>
-        <th>節數</th>
-        <th>時間</th>
-        <th>球員</th>
-        <th>得分</th>
-        <th>隊伍</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-
+  <h3>SCOREBOARD</h3>
   <table class="scoreboard">
     <thead>
       <tr>
@@ -194,10 +181,26 @@
         <td id="score-team-b">0</td>
         <td class="score-control">
           <button onclick="updateScore('B', 1)">+1</button>
-          <button onclick="updateScore('B', -1)">-1</button>
+          <button onclick="updateScore('B', 2)">+2</button>
+          <button onclick="updateScore('B', 3)">+3</button>
+          <button onclick="updateScore('B', -1)">-1</button>       
         </td>
       </tr>
     </tbody>
   </table>  
+
+  <h4>PLAY BY PLAY</h4>
+  <table id="score-log" border="1">
+    <thead>
+      <tr>
+        <th>節數</th>
+        <th>時間</th>
+        <th>球員</th>
+        <th>動作</th>
+        <th>隊伍</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 </body>
 </html>

@@ -114,6 +114,8 @@ function addMade(number, type, delta) {
   stats.score = stats.twoMade * 2 + stats.threeMade * 3 + stats.ftMade;
   updateUI(number);
   updateTeamTotal();
+
+  if (delta !== 0) logStatChange(number, `${type.toUpperCase()} 命中`);
 }
 
 function addMiss(number, type, delta) {
@@ -122,6 +124,8 @@ function addMiss(number, type, delta) {
   stats[key] = Math.max(0, stats[key] + delta);
   updateUI(number);
   updateTeamTotal();
+
+  if (delta !== 0) logStatChange(number, `${type.toUpperCase()} 沒中`);
 }
 
 function addStat(number, type, delta) {
@@ -130,6 +134,8 @@ function addStat(number, type, delta) {
   stats.score = stats.twoMade * 2 + stats.threeMade * 3 + stats.ftMade;
   updateUI(number);
   updateTeamTotal();
+
+  if (delta !== 0) logStatChange(number, type);
 }
 
 function updateUI(number) {
@@ -247,6 +253,31 @@ function updateScore(team, value) {
     let scoreB = document.getElementById("score-team-b");
     let newScore = Math.max(0, parseInt(scoreB.textContent) + value);
     scoreB.textContent = newScore;
+
+    if (value > 0) {
+      const minutes = Math.floor(gameTime / 60);
+      const seconds = gameTime % 60;
+      const timeStr = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+      // 🆕 根據加分值設定動作文字
+      let actionText = "";
+      if (value === 1) actionText = "罰球得分";
+      else if (value === 2) actionText = "兩分進";
+      else if (value === 3) actionText = "三分進";
+      else actionText = `得 ${value} 分`; // fallback
+
+      const teamNameB = document.getElementById("display-team-b").innerText.trim(); // ✅ 讀使用者輸入的隊名
+
+      const logRow = document.createElement("tr");
+      logRow.innerHTML = `
+        <td>${currentQuarter}</td>
+        <td>${timeStr}</td>
+        <td>-</td>
+        <td>${actionText}</td>
+        <td>${teamNameB}</td>
+      `;
+      document.querySelector("#score-log tbody").appendChild(logRow);
+    }
   }
 }
 
@@ -336,3 +367,24 @@ window.onload = function() {
   document.getElementById('pause-btn').addEventListener('click', pauseTimer);
   document.getElementById('resume-btn').addEventListener('click', resumeTimer);
 };
+
+function logStatChange(number, actionType) {
+  const player = players[number];
+  if (!player) return;
+
+  const minutes = Math.floor(gameTime / 60);
+  const seconds = gameTime % 60;
+  const timeStr = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+  const logRow = document.createElement("tr");
+  logRow.innerHTML = `
+    <td>${currentQuarter}</td>
+    <td>${timeStr}</td>
+    <td>${player.name}</td>
+    <td>${actionType}</td>
+    <td>IM</td> <!-- 這裡如果你有隊伍資訊可以替換 -->
+  `;
+
+  document.querySelector("#score-log tbody").appendChild(logRow);
+}
+
