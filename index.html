@@ -109,6 +109,13 @@
     <button onclick="addSelectedPlayer()">新增球員</button>
   </div>
 
+  <button id="start-btn" onclick="startTimer()">開始比賽</button>
+  <button id="pause-btn" onclick="pauseTimer()" disabled>暫停比賽</button>
+  <button id="resume-btn" onclick="resumeTimer()">繼續比賽</button>
+
+  <p>目前比賽節數：<span id="quarter">1</span></p>
+  <p>剩餘時間：<span id="game-time">10:00</span></p>
+
   <table id="stats-table">
     <thead>
       <tr>
@@ -150,6 +157,21 @@
         <td id="team-foul"></td>
       </tr>
     </tfoot>
+  </table>
+
+  <h2>得分紀錄</h2>
+  <table id="event-log">
+    <thead>
+      <tr>
+        <th>節數</th>
+        <th>時間</th>
+        <th>球員</th>
+        <th>得分</th>
+        <th>隊伍</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
   </table>
 
   <table class="scoreboard">
