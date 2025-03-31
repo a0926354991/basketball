@@ -148,8 +148,10 @@
   <table id="stats-table">
     <thead>
       <tr>
+        <th>上下場</th>
         <th onclick="sortTable(0)"><span class="sort-label">背號</span></th>
         <th onclick="sortTable(1)"><span class="sort-label">名字</span></th>
+        <th onclick="sortTable(17)"><span class="sort-label">時間</span></th>
         <th onclick="sortTable(2)"><span class="sort-label">2分</span></th>
         <th onclick="sortTable(3)"><span class="sort-label">2分%</span></th>
         <th onclick="sortTable(4)"><span class="sort-label">3分</span></th>
@@ -164,14 +166,14 @@
         <th onclick="sortTable(13)"><span class="sort-label">阻攻</span></th>
         <th onclick="sortTable(14)"><span class="sort-label">失誤</span></th>
         <th onclick="sortTable(15)"><span class="sort-label">犯規</span></th>
-        <th>上下場</th>
-        <th onclick="sortTable(16)"><span class="sort-label">時間</span></th>
+        <th onclick="sortTable(16)"><span class="sort-label">正負值</span></th>
       </tr>
     </thead>
     <tbody id="player-table"></tbody>
     <tfoot>
       <tr id="team-total-row">
-        <td colspan="2">全隊合計</td>
+        <td colspan="3">全隊合計</td>
+        <td id="time"></td>
         <td id="team-2pt"></td>
         <td id="team-2pt-pct"></td>
         <td id="team-3pt"></td>
@@ -186,8 +188,7 @@
         <td id="team-block"></td>
         <td id="team-turnover"></td>
         <td id="team-foul"></td>
-        <td id="up/down"></td>
-        <td id="time"></td>
+        <td id="team-+/-"></td>
       </tr>
     </tfoot>
   </table>

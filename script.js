@@ -87,8 +87,15 @@ function renderPlayerRow(number) {
   }
 
   row.innerHTML = `
+    <td>
+      <div class="sub-button-group" id="sub-control-${number}">
+        <button id="in-btn-${number}" onclick="playerSubIn('${number}')">上場</button>
+        <button id="out-btn-${number}" onclick="playerSubOut('${number}')">下場</button>
+      </div>
+    </td>
     <td>${number}</td>
     <td>${players[number].name}</td>
+    <td id="playtime-${number}">0:00</td>
     <td>${createSplitShotControl('two')}</td>
     <td id="percent-2pt-${number}">0%</td>
     <td>${createSplitShotControl('three')}</td>
@@ -103,13 +110,7 @@ function renderPlayerRow(number) {
     <td>${createStatControl('block')}</td>
     <td>${createStatControl('turnover')}</td>
     <td>${createStatControl('foul')}</td>
-    <td>
-      <div class="sub-button-group" id="sub-control-${number}">
-        <button id="in-btn-${number}" onclick="playerSubIn('${number}')">上場</button>
-        <button id="out-btn-${number}" onclick="playerSubOut('${number}')">下場</button>
-      </div>
-    </td>
-    <td id="playtime-${number}">0:00</td>
+    <td id="plusminus-${number}">0</td>
   `;
 
   table.appendChild(row);
@@ -237,14 +238,20 @@ function sortTable(n) {
     // ⬇️ 把這裡原本的 getCellValue 換成這個新版（有處理 mm:ss）
     const getCellValue = (row, index) => {
       const text = row.children[index].innerText.trim();
+    
       if (text.includes(":")) {
         const [m, s] = text.split(":").map(Number);
-        return m * 60 + s; // ➕ 支援 mm:ss 格式排序
+        return m * 60 + s;
       }
-      if (text.includes('-')) return parseFloat(text.split('-')[0]) || 0;
-      if (text.includes('%')) return parseFloat(text.replace('%', '')) || 0;
-      return isNaN(text) ? text : parseFloat(text);
-    };
+    
+      if (text.endsWith('%')) return parseFloat(text.replace('%', '')) || 0;
+    
+      // ✅ 嘗試解析為數字（支援正負數）
+      const num = parseFloat(text);
+      if (!isNaN(num)) return num;
+    
+      return text; // fallback 為字串排序
+    };    
 
     const x = getCellValue(a, n);
     const y = getCellValue(b, n);
@@ -486,9 +493,16 @@ function playerSubIn(number) {
   const player = players[number];
   const alreadyOn = player.playing_sessions.some(s => s.out === null);
   if (!alreadyOn) {
-    player.playing_sessions.push({ in: gameTime, out: null });
+    const selfScore = parseInt(document.getElementById("score-team-a").textContent);
+    const oppScore = parseInt(document.getElementById("score-team-b").textContent);
+    
+    player.playing_sessions.push({
+      in: gameTime,
+      out: null,
+      scoreAtIn: { self: selfScore, opponent: oppScore },
+      scoreAtOut: null
+    });
 
-    // 樣式變綠
     document.getElementById(`in-btn-${number}`).classList.add("active");
     document.getElementById(`out-btn-${number}`).classList.remove("inactive");
   }
@@ -500,7 +514,21 @@ function playerSubOut(number) {
   if (session) {
     session.out = gameTime;
 
-    // 樣式變灰
+    const selfScore = parseInt(document.getElementById("score-team-a").textContent);
+    const oppScore = parseInt(document.getElementById("score-team-b").textContent);
+
+    session.scoreAtOut = { self: selfScore, opponent: oppScore };
+
+    // 計算本段正負值
+    const diffIn = session.scoreAtIn.self - session.scoreAtIn.opponent;
+    const diffOut = session.scoreAtOut.self - session.scoreAtOut.opponent;
+    const plusMinus = diffOut - diffIn;
+
+    player.plusMinus = (player.plusMinus || 0) + plusMinus;
+
+    const el = document.getElementById(`plusminus-${number}`);
+    if (el) el.textContent = player.plusMinus >= 0 ? `+${player.plusMinus}` : player.plusMinus;
+    
     document.getElementById(`in-btn-${number}`).classList.remove("active");
     document.getElementById(`out-btn-${number}`).classList.add("inactive");
   }
