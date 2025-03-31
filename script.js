@@ -528,6 +528,8 @@ function playerSubOut(number) {
   if (session) {
     session.out = gameTime;
 
+    session.duration = session.in - session.out;
+
     const selfScore = parseInt(document.getElementById("score-team-a").textContent);
     const oppScore = parseInt(document.getElementById("score-team-b").textContent);
 
@@ -546,4 +548,81 @@ function playerSubOut(number) {
     document.getElementById(`in-btn-${number}`).classList.remove("active");
     document.getElementById(`out-btn-${number}`).classList.add("inactive");
   }
+}
+
+function saveGameToFirebase() {
+  const gameData = {
+    timestamp: new Date(),
+    players: {}
+  };
+
+  for (let number in players) {
+    const player = players[number];
+    const stats = player.stats;
+
+    // 🕒 計算總上場時間（秒）
+    const totalPlaySeconds = player.playing_sessions.reduce((sum, s) => {
+      return sum + (s.duration || 0);
+    }, 0);
+
+    // 💡 計算 EFF
+    const fieldGoalAttempt = stats.twoMade + stats.twoMiss + stats.threeMade + stats.threeMiss;
+    const fieldGoalMade = stats.twoMade + stats.threeMade;
+    const rebounds = stats.offensive_rebound + stats.defensive_rebound;
+
+    const eff = stats.score
+      + rebounds
+      + stats.assist
+      + stats.steal
+      + stats.block
+      - ((fieldGoalAttempt - fieldGoalMade) + stats.ftMiss + stats.turnover);
+
+    gameData.players[number] = {
+      name: player.name,
+      stats: { ...stats },
+      total_play_time: totalPlaySeconds,  // ✅ 這是你要的
+      plusMinus: player.plusMinus || 0,
+      eff: eff
+    };
+  }
+
+  // 用日期當作 ID
+  const today = new Date();
+  const gameId = today.toISOString().split('T')[0];
+
+  db.collection("games").doc(gameId).set(gameData)
+    .then(() => {
+      alert("比賽資料已儲存！ID: " + gameId);
+    })
+    .catch((error) => {
+      console.error("儲存失敗: ", error);
+      alert("儲存失敗");
+    });
+}
+
+function downloadPlayByPlay() {
+  const table = document.querySelector("#score-log");
+  const rows = Array.from(table.querySelectorAll("tr"));
+  let csvContent = "";
+
+  // 抓每列資料
+  rows.forEach(row => {
+    const cols = Array.from(row.querySelectorAll("th, td"))
+      .map(col => `"${col.innerText.trim()}"`)
+      .join(",");
+    csvContent += cols + "\n";
+  });
+
+  // ✅ 加上 UTF-8 BOM
+  const BOM = "\uFEFF";
+  const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
+
+  // 下載
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "play_by_play.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }

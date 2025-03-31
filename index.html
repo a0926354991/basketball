@@ -127,7 +127,7 @@
   
   <script defer src="script.js"></script>
 </head>
-<body>
+
   <h1>籃球比賽紀錄系統</h1>
 
   <div>
@@ -135,6 +135,10 @@
       <option value="">請選擇球員</option>
     </select>
     <button onclick="addSelectedPlayer()">新增球員</button>
+  </div>
+
+  <div>
+    <button onclick="saveGameToFirebase()">儲存比賽數據</button>
   </div>
 
   <button id="start-btn" onclick="startTimer()">開始比賽</button>
@@ -225,6 +229,7 @@
   </table>  
 
   <h1>PLAY BY PLAY</h1>
+  <button onclick="downloadPlayByPlay()">下載 Play by Play CSV</button>
   <table id="score-log" border="1">
     <thead>
       <tr>
