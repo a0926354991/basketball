@@ -37,3 +37,32 @@ th {
     background-color: #007BFF;
     color: white;
 }
+
+.sub-button-group {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+  
+.sub-button-group button {
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #999;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+  
+/* 狀態樣式 */
+button.active {
+    background-color: #28a745;  /* 綠色 */
+    color: white;
+    font-weight: bold;
+}
+  
+button.inactive {
+    background-color: #ccc;     /* 灰色 */
+    color: #666;
+    cursor: default;
+}
+  

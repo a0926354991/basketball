@@ -33,6 +33,7 @@ function addSelectedPlayer() {
 
   players[number] = {
     name: selected.name,
+    playing_sessions: [], 
     stats: {
       score: 0,
       twoMade: 0,
@@ -102,6 +103,13 @@ function renderPlayerRow(number) {
     <td>${createStatControl('block')}</td>
     <td>${createStatControl('turnover')}</td>
     <td>${createStatControl('foul')}</td>
+    <td>
+      <div class="sub-button-group" id="sub-control-${number}">
+        <button id="in-btn-${number}" onclick="playerSubIn('${number}')">上場</button>
+        <button id="out-btn-${number}" onclick="playerSubOut('${number}')">下場</button>
+      </div>
+    </td>
+    <td id="playtime-${number}">0:00</td>
   `;
 
   table.appendChild(row);
@@ -137,6 +145,22 @@ function addStat(number, type, delta) {
   updateTeamTotal();
 
   if (delta !== 0) logStatChange(number, type);
+}
+
+function playerSubIn(number) {
+  const player = players[number];
+  const alreadyOn = player.playing_sessions.some(s => s.out === null);
+  if (!alreadyOn) {
+    player.playing_sessions.push({ in: gameTime, out: null });
+  }
+}
+
+function playerSubOut(number) {
+  const player = players[number];
+  const session = player.playing_sessions.find(s => s.out === null);
+  if (session) {
+    session.out = gameTime;
+  }
 }
 
 function updateUI(number) {
@@ -210,8 +234,13 @@ function sortTable(n) {
   header.classList.toggle("desc", !isAsc);
 
   rows.sort((a, b) => {
+    // ⬇️ 把這裡原本的 getCellValue 換成這個新版（有處理 mm:ss）
     const getCellValue = (row, index) => {
       const text = row.children[index].innerText.trim();
+      if (text.includes(":")) {
+        const [m, s] = text.split(":").map(Number);
+        return m * 60 + s; // ➕ 支援 mm:ss 格式排序
+      }
       if (text.includes('-')) return parseFloat(text.split('-')[0]) || 0;
       if (text.includes('%')) return parseFloat(text.replace('%', '')) || 0;
       return isNaN(text) ? text : parseFloat(text);
@@ -326,16 +355,48 @@ function startTimer() {
   if (!intervalId && currentQuarter <= 4) { // 確保計時器尚未開始且比賽未結束
     isPaused = false;
     intervalId = setInterval(function() {
-      if (!isPaused) { 
+      if (!isPaused) {
         gameTime--;
         updateGameTime();
-        if (gameTime === 0) { 
+    
+        // ⏱️ 更新所有球員的上場時間
+        for (let number in players) {
+          const player = players[number];
+          const totalSeconds = player.playing_sessions.reduce((sum, s) => {
+            const start = s.in;
+            const end = s.out !== null ? s.out : gameTime;
+            return sum + (start - end);
+          }, 0);
+    
+          const m = Math.floor(totalSeconds / 60);
+          const s = totalSeconds % 60;
+          const display = `${m}:${s.toString().padStart(2, '0')}`;
+          const el = document.getElementById(`playtime-${number}`);
+          if (el) el.textContent = display;
+        }
+
+        // ✅ 更新全隊總時間欄位
+        let totalPlaySeconds = 0;
+        for (let number in players) {
+          const player = players[number];
+          const total = player.playing_sessions.reduce((sum, s) => {
+            const start = s.in;
+            const end = s.out !== null ? s.out : gameTime;
+            return sum + (start - end);
+          }, 0);
+          totalPlaySeconds += total;
+        }
+        const tm = Math.floor(totalPlaySeconds / 60);
+        const ts = totalPlaySeconds % 60;
+        document.getElementById("time").textContent = `${tm}:${ts.toString().padStart(2, "0")}`;
+    
+        if (gameTime === 0) {
           clearInterval(intervalId);
           intervalId = null;
-          nextQuarter(); // 進入下一節
+          nextQuarter();
         }
       }
-    }, 1000);
+    }, 1000);    
 
     // 按鈕狀態調整
     document.getElementById('start-btn').disabled = true; 
@@ -421,3 +482,26 @@ function logStatChange(number, actionType) {
   document.querySelector("#score-log tbody").appendChild(logRow);
 }
 
+function playerSubIn(number) {
+  const player = players[number];
+  const alreadyOn = player.playing_sessions.some(s => s.out === null);
+  if (!alreadyOn) {
+    player.playing_sessions.push({ in: gameTime, out: null });
+
+    // 樣式變綠
+    document.getElementById(`in-btn-${number}`).classList.add("active");
+    document.getElementById(`out-btn-${number}`).classList.remove("inactive");
+  }
+}
+
+function playerSubOut(number) {
+  const player = players[number];
+  const session = player.playing_sessions.find(s => s.out === null);
+  if (session) {
+    session.out = gameTime;
+
+    // 樣式變灰
+    document.getElementById(`in-btn-${number}`).classList.remove("active");
+    document.getElementById(`out-btn-${number}`).classList.add("inactive");
+  }
+}

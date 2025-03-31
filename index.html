@@ -95,6 +95,34 @@
       margin: 5px 0;
       font-size: 16px;
     }
+
+    .sub-button-group {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+      
+    .sub-button-group button {
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #999;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+      
+    /* 狀態樣式 */
+    button.active {
+      background-color: #28a745;  /* 綠色 */
+      color: white;
+      font-weight: bold;
+    }
+      
+    button.inactive {
+      background-color: #ccc;     /* 灰色 */
+      color: #666;
+      cursor: default;
+    }
   </style>
   
   <script defer src="script.js"></script>
@@ -116,7 +144,7 @@
   <p>目前比賽節數：<span id="quarter">1</span></p>
   <p>剩餘時間：<span id="game-time">10:00</span></p>
 
-  <h2>BOXSCORE</h2>
+  <h1>BOXSCORE</h1>
   <table id="stats-table">
     <thead>
       <tr>
@@ -136,6 +164,8 @@
         <th onclick="sortTable(13)"><span class="sort-label">阻攻</span></th>
         <th onclick="sortTable(14)"><span class="sort-label">失誤</span></th>
         <th onclick="sortTable(15)"><span class="sort-label">犯規</span></th>
+        <th>上下場</th>
+        <th onclick="sortTable(16)"><span class="sort-label">時間</span></th>
       </tr>
     </thead>
     <tbody id="player-table"></tbody>
@@ -156,11 +186,13 @@
         <td id="team-block"></td>
         <td id="team-turnover"></td>
         <td id="team-foul"></td>
+        <td id="up/down"></td>
+        <td id="time"></td>
       </tr>
     </tfoot>
   </table>
 
-  <h3>SCOREBOARD</h3>
+  <h1>SCOREBOARD</h1>
   <table class="scoreboard">
     <thead>
       <tr>
@@ -189,7 +221,7 @@
     </tbody>
   </table>  
 
-  <h4>PLAY BY PLAY</h4>
+  <h1>PLAY BY PLAY</h1>
   <table id="score-log" border="1">
     <thead>
       <tr>
