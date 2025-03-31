@@ -111,6 +111,7 @@ function renderPlayerRow(number) {
     <td>${createStatControl('turnover')}</td>
     <td>${createStatControl('foul')}</td>
     <td id="plusminus-${number}">0</td>
+    <td id="eff-${number}">0</td>
   `;
 
   table.appendChild(row);
@@ -167,6 +168,19 @@ function playerSubOut(number) {
 function updateUI(number) {
   const stats = players[number].stats;
   document.getElementById(`score-${number}`).innerText = stats.score;
+
+  const fieldGoalAttempt = stats.twoMade + stats.twoMiss + stats.threeMade + stats.threeMiss;
+  const fieldGoalMade = stats.twoMade + stats.threeMade;
+  const rebounds = stats.offensive_rebound + stats.defensive_rebound;
+
+  const eff = stats.score
+    + rebounds
+    + stats.assist
+    + stats.steal
+    + stats.block
+    - ((fieldGoalAttempt - fieldGoalMade) + stats.ftMiss + stats.turnover);
+
+  document.getElementById(`eff-${number}`).innerText = eff;
 
   function pct(made, miss) {
     const total = made + miss;
