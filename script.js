@@ -1,6 +1,7 @@
 // 初始化 Firebase
 const roster = {};
 const players = {};
+const scoreActionStack = [];  // 記錄每一個加分行為
 
 firebase.initializeApp({
   apiKey: "AIzaSyBf1kfIKDTITQ-CxcQ7q4a7mLMh96r3gVI",
@@ -242,45 +243,77 @@ function updateSortableHeaders() {
 }
 
 function updateScore(team, value) {
-  if (team === 'A') {
-    let scoreA = document.getElementById("score-team-a");
-    let newScore = Math.max(0, parseInt(scoreA.textContent) + value); // 確保不會變負數
-    scoreA.textContent = newScore;
+  // 🟥 處理「回復上一動」
+  if (value < 0) {
+    const lastAction = scoreActionStack.pop();
+    if (!lastAction) return;
 
-    // 同步更新隊伍合計得分
-    document.getElementById("team-score").textContent = newScore;
-  } else if (team === 'B') {
-    let scoreB = document.getElementById("score-team-b");
-    let newScore = Math.max(0, parseInt(scoreB.textContent) + value);
-    scoreB.textContent = newScore;
+    const rollbackValue = lastAction.value;
 
-    if (value > 0) {
-      const minutes = Math.floor(gameTime / 60);
-      const seconds = gameTime % 60;
-      const timeStr = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
-      // 🆕 根據加分值設定動作文字
-      let actionText = "";
-      if (value === 1) actionText = "罰球得分";
-      else if (value === 2) actionText = "兩分進";
-      else if (value === 3) actionText = "三分進";
-      else actionText = `得 ${value} 分`; // fallback
-
-      const teamNameB = document.getElementById("display-team-b").innerText.trim(); // ✅ 讀使用者輸入的隊名
-
-      const logRow = document.createElement("tr");
-      logRow.innerHTML = `
-        <td>${currentQuarter}</td>
-        <td>${timeStr}</td>
-        <td>-</td>
-        <td>${actionText}</td>
-        <td>${teamNameB}</td>
-      `;
-      document.querySelector("#score-log tbody").appendChild(logRow);
+    if (lastAction.team === 'A') {
+      const scoreA = document.getElementById("score-team-a");
+      const newScore = Math.max(0, parseInt(scoreA.textContent) - rollbackValue);
+      scoreA.textContent = newScore;
+      document.getElementById("team-score").textContent = newScore;
+    } else if (lastAction.team === 'B') {
+      const scoreB = document.getElementById("score-team-b");
+      const newScore = Math.max(0, parseInt(scoreB.textContent) - rollbackValue);
+      scoreB.textContent = newScore;
     }
+
+    // 🟥 刪除最後一筆 scoreboard log（不碰球員紀錄）
+    const logs = document.querySelectorAll("#score-log tbody .scoreboard-log");
+    if (logs.length > 0) {
+      logs[logs.length - 1].remove();
+    }
+
+    return;
+  }
+
+  // 🟩 正常加分處理
+  if (value > 0) {
+    // ⬇️ 儲存這次動作
+    scoreActionStack.push({ team, value });
+
+    // ⬇️ 更新分數
+    if (team === 'A') {
+      const scoreA = document.getElementById("score-team-a");
+      const newScore = parseInt(scoreA.textContent) + value;
+      scoreA.textContent = newScore;
+      document.getElementById("team-score").textContent = newScore;
+    } else if (team === 'B') {
+      const scoreB = document.getElementById("score-team-b");
+      const newScore = parseInt(scoreB.textContent) + value;
+      scoreB.textContent = newScore;
+    }
+
+    // ⬇️ 建立 Play by Play 紀錄
+    const minutes = Math.floor(gameTime / 60);
+    const seconds = gameTime % 60;
+    const timeStr = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+    let actionText = "";
+    if (value === 1) actionText = "罰球得分";
+    else if (value === 2) actionText = "兩分進";
+    else if (value === 3) actionText = "三分進";
+    else actionText = `得 ${value} 分`;
+
+    const teamName = team === 'A'
+      ? document.getElementById("display-team-a").innerText.trim()
+      : document.getElementById("display-team-b").innerText.trim();
+
+    const logRow = document.createElement("tr");
+    logRow.classList.add("scoreboard-log"); // 用於 -1 時可辨識
+    logRow.innerHTML = `
+      <td>${currentQuarter}</td>
+      <td>${timeStr}</td>
+      <td>-</td>
+      <td>${actionText}</td>
+      <td>${teamName}</td>
+    `;
+    document.querySelector("#score-log tbody").appendChild(logRow);
   }
 }
-
 
 // 記錄當前比賽時間和節數
 let gameTime = 600; // 每節10分鐘
